@@ -3,6 +3,7 @@ package org.pitest.plugin.export;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class MutantExportInterceptorTest {
   public void setUp() {
     Collection<MethodMutatorFactory> mutators = Mutator.defaults();
     mutator = new GregorMutater(source, True.<MethodInfo>all(), mutators);
-    testee = new MutantExportInterceptor(fileSystem, null, "target");
+    testee = new MutantExportInterceptor(fileSystem, source, "target");
   }
 
   @Test
@@ -55,25 +56,60 @@ public class MutantExportInterceptorTest {
   }
 
   @Test
-  public void shouldWriteAllMutantBytesToDisk() {
-    Collection<MutationDetails> mutations = mutator.findMutations(ClassName.fromClass(VeryMutable.class));
+  public void shouldWriteMutantBytesToDisk() {
+    Collection<MutationDetails> mutations = executeFor(VeryMutable.class);
+    
+    Mutant firstMutant = mutator.getMutation(mutations.iterator().next().getId());
+    Path shouldBeCreated = mutantBasePath(VeryMutable.class,0).resolve(ClassName.fromClass(VeryMutable.class).asJavaName() + ".class");
+    assertThat(shouldBeCreated).hasBinaryContent(firstMutant.getBytes());
+  }
+
+  @Test
+  public void shouldWriteMutantDetailsToDisk() {
+    Collection<MutationDetails> mutations = executeFor(VeryMutable.class);
+    
+    MutationDetails firstMutant = mutations.iterator().next();
+    Path shouldBeCreated = mutantBasePath(VeryMutable.class,0).resolve("details.txt");
+    assertThat(shouldBeCreated).hasContent(firstMutant.toString());
+  }
+  
+  @Test
+  public void shouldWriteDissasembledMutantBytecodeToDisk() {
+    executeFor(VeryMutable.class);
+    Path shouldBeCreated = mutantBasePath(VeryMutable.class,0).resolve(ClassName.fromClass(VeryMutable.class).asJavaName() + ".txt");
+    assertThat(shouldBeCreated).exists();
+  }
+  
+
+  @Test
+  public void shouldWriteDisassembledOriginalBytecodeToDisk() {
+    executeFor(VeryMutable.class);
+    Path shouldBeCreated = classBasePath(VeryMutable.class).resolve(ClassName.fromClass(VeryMutable.class).asJavaName() + ".txt");
+    assertThat(shouldBeCreated).exists();
+  }
+  
+  
+  private Collection<MutationDetails> executeFor(Class<?> clazz) {
+    Collection<MutationDetails> mutations = mutator.findMutations(ClassName.fromClass(clazz));
     
     testee.begin(tree(VeryMutable.class));
     testee.intercept(mutations, mutator);
     testee.end();
-    
-    Mutant firstMutant = mutator.getMutation(mutations.iterator().next().getId());
-    assertThat(fileSystem.getPath("target",firstMutantPath(VeryMutable.class))).hasBinaryContent(firstMutant.getBytes());
+    return mutations;
   }
   
-  
-  private String[] firstMutantPath(Class<?> clazz) {
-    ClassName name = ClassName.fromClass(clazz);
-    return (name.asInternalName() + "/mutants/0/" + name.asJavaName() + ".class").split("/");
-  }
 
   private ClassTree tree(Class<?> clazz) {
     return ClassTree.fromBytes(source.getBytes(clazz.getName()).value());
+  }
+  
+  private Path mutantBasePath(Class<?> clazz, int mutant) {
+    return classBasePath(clazz).resolve("mutants").resolve(""+ mutant);
+  }
+  
+  private Path classBasePath(Class<?> clazz) {
+    ClassName name = ClassName.fromClass(clazz);
+    return fileSystem.getPath("target",name.asInternalName().split("/"));
   }
 }
 
