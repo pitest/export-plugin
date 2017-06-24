@@ -77,12 +77,17 @@ or for gradle
 buildscript {
    repositories {
        mavenCentral()
+       maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
    }
    configurations.maybeCreate("pitest")
    dependencies {
        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
        pitest 'org.pitest.plugins:pitest-export-plugin:0.1-SNAPSHOT'
    }
+}
+
+pitest {
+    pitestVersion = "1.2.1-SNAPSHOT"
 }
 ```
 
