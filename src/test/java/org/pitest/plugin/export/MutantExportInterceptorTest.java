@@ -8,10 +8,10 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pitest.bytecode.analysis.ClassTree;
 import org.pitest.classinfo.ClassName;
 import org.pitest.classpath.ClassloaderByteArraySource;
 import org.pitest.functional.predicate.True;
-import org.pitest.mutationtest.build.ClassTree;
 import org.pitest.mutationtest.engine.Mutant;
 import org.pitest.mutationtest.engine.MutationDetails;
 import org.pitest.mutationtest.engine.gregor.GregorMutater;

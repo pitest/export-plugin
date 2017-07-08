@@ -2,10 +2,10 @@ package org.pitest.plugin.export;
 
 import java.nio.file.FileSystems;
 
-import org.pitest.classinfo.ClassByteArraySource;
+import org.pitest.mutationtest.build.InterceptorParameters;
 import org.pitest.mutationtest.build.MutationInterceptor;
 import org.pitest.mutationtest.build.MutationInterceptorFactory;
-import org.pitest.mutationtest.config.ReportOptions;
+import org.pitest.plugin.Feature;
 
 public class MutantExportFactory implements MutationInterceptorFactory {
 
@@ -15,9 +15,15 @@ public class MutantExportFactory implements MutationInterceptorFactory {
   }
 
   @Override
-  public MutationInterceptor createInterceptor(ReportOptions data,
-      ClassByteArraySource source) {
-    return new MutantExportInterceptor(FileSystems.getDefault(), source, data.getReportDir());
+  public MutationInterceptor createInterceptor(InterceptorParameters params) {
+    return new MutantExportInterceptor(FileSystems.getDefault(), params.source(), params.data().getReportDir());
+  }
+
+  @Override
+  public Feature provides() {
+    return Feature.named("EXPORT")
+        .withDescription("Exports mutants bytecode and other details to disk")
+        .withOnByDefault(true);
   }
 
 }

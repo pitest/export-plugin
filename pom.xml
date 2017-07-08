@@ -11,7 +11,7 @@
 	<description>Writes mutant details to disk</description>
 
 	<properties>
-		<pitest.version>1.2.1-SNAPSHOT</pitest.version>
+		<pitest.version>1.2.2</pitest.version>
 	</properties>
 
 	<build>

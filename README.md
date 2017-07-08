@@ -44,7 +44,7 @@ Note that the numbering of the mutants is arbritrary.
 
 ## Usage
 
-The plugin require pitest 1.2.1 or later (not released at the point of writing) and Java 7 or higher.
+The plugin requires pitest 1.2.2 or later and Java 7 or higher.
 
 To activate the plugin it must be placed on the classpath of the pitest tool (**not** on the classpath of the project being mutated).
 
