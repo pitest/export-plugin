@@ -1,3 +1,5 @@
+**Note, the functionality provided by this plugin is now built into pitest as of release 1.3.0**
+
 # Export plugin
 
 This plugin writes out the details of generated mutants to disk - a common feature request from academic researcher.
